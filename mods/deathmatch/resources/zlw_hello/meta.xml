@@ -1,0 +1,4 @@
+<meta>
+    <info type="misc" version="1.0.0"></info>
+    <script src="hello_world.lua" type="server"></script>
+</meta>
