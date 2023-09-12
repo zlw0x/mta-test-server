@@ -1,0 +1,5 @@
+<meta>
+    <info author="Zolotov_A" type="misc"version="1.0.0"></info>
+    <script src="create_car.lua" type="server"></script>
+    <script src="car_handling.lua" type="server"></script>
+</meta>
