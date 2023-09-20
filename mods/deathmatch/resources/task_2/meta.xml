@@ -1,0 +1,7 @@
+<meta>
+  <info author="Zolotov_A" version="1.0.0"/>
+  <script src="SPlayerId.lua" type="server"/>
+  <script src="SFaction.lua" type="server"/>
+  <script src="CPlayerId.lua" type="client"/>
+  <script src="CFactionGUI.lua" type="client"/>
+</meta>
