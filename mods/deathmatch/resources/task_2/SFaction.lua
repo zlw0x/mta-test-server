@@ -145,8 +145,12 @@ function sendInvite( player_id, faction_name, sender )
 end
 
 
-function sendFactionData( player, faction_id )  -- UPD: отправка клиенту информации о фракции
-    local fact_data = FACTION[ faction_id ]
+function sendFactionData( player )
+    local fact_data = nil
+    local faction_id = getPlayerFaction( player )
+    if faction_id then  -- UPD: отправка клиенту информации о фракции
+        fact_data = FACTION[ faction_id ]
+    end
     triggerClientEvent( player, "setFactionData", resourceRoot, fact_data )
 end
 

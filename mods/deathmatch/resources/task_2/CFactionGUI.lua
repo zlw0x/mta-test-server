@@ -4,10 +4,14 @@ local faction_id = ''
 function refreshFactionData()                                   -- UPD: функция получения информации о фракции
     faction_id = getElementData( getLocalPlayer(), "faction" )
     if faction_id then 
-        triggerServerEvent( "refreshFactionData", resourceRoot, getLocalPlayer(), faction_id)
+        triggerServerEvent( "refreshFactionData", resourceRoot, getLocalPlayer() )
         addEvent( "setFactionData", true )
         addEventHandler( "setFactionData", resourceRoot, function( fact_data )
-            faction = fact_data
+            if fact_data then
+                faction = fact_data
+            else
+                faction = nil
+            end
         end )
     end
 end
