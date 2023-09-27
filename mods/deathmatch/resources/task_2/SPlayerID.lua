@@ -1,16 +1,13 @@
 local ALL_ID = {}
 
-for i = 1, getMaxPlayers() do
-	table.insert( ALL_ID, i, true ) -- заполняем таблицу доступных id
-end
 
-function setPlayerID( player )
-	local cur_id = 1 -- начинаем с единицы 
-    while ( ALL_ID[ cur_id ] == false ) do -- если занят пробуем следующий
+function setPlayerID( player )    -- UPD: (1) убрал лимит id по getMaxPlayers
+    cur_id = 1                              -- выдача ид c помощью ipairs
+    for k, v in ipairs( ALL_ID ) do    
         cur_id = cur_id + 1
     end
     setElementData( player, "player_id", cur_id ) 
-    ALL_ID[ cur_id ] = false -- помечаем занятым
+    ALL_ID[ cur_id ] = player
 end            
 
 addEventHandler( "onResourceStart", root, function()
@@ -25,7 +22,6 @@ end )
 
 addEventHandler ( "onPlayerQuit", getRootElement(), function() -- при выходе освобождаем id и очищаем елементдату
     local cur_id = getElementData( source, "player_id" )
-    ALL_ID[ cur_id ] = true
+    ALL_ID[ cur_id ] = nil
     removeElementData( source, "player_id" ) 
 end )
-

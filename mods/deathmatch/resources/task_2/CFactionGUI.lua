@@ -1,78 +1,72 @@
-local INVITE_SPAM = {}
+local faction = nil
+local faction_id = ''
 
-function getClientTeamMembers() 
-    return getPlayersInTeam( getPlayerTeam( getLocalPlayer() ) )
- end
-
-function getClientTeamName()
-    return getTeamName( getPlayerTeam( getLocalPlayer() ) )
-end
-
-function destroyWindow( window )
-    if isElement ( window ) then
-        destroyElement( window )
+function refreshFactionData()                                   -- UPD: функция получения информации о фракции
+    faction_id = getElementData( getLocalPlayer(), "faction" )
+    if faction_id then 
+        triggerServerEvent( "refreshFactionData", resourceRoot, getLocalPlayer(), faction_id)
+        addEvent( "setFactionData", true )
+        addEventHandler( "setFactionData", resourceRoot, function( fact_data )
+            faction = fact_data
+        end )
     end
 end
 
-function createTeamWindow()
-    local team = getPlayerTeam( getLocalPlayer() )
-    if team then 
-        TEAM_WINDOW = guiCreateWindow( 0.25, 0.25, 0.4, 0.5, getTeamName( team ), true )  
-        local tab_panel = guiCreateTabPanel( 0, 0.05, 1, 1, true, TEAM_WINDOW )          
-        local members_tab = guiCreateTab( "Список участников", tab_panel )                
-        local city_tab = guiCreateTab( "Управление городом", tab_panel ) 
-        local delete_label = guiCreateLabel( 0.55, 0.05, 0.4, 0.1, "Выберите игрока из списка", true, members_tab )
-        local delete_button = guiCreateButton( 0.55, 0.11, 0.4, 0.1, "Уволить", true, members_tab )
-        local invite_label = guiCreateLabel( 0.55, 0.3, 0.4, 0.1, "Введите ID игрока", true, members_tab )
-        local invite_edit = guiCreateEdit( 0.54, 0.36, 0.2, 0.1, "", true, members_tab )
-        guiEditSetMaxLength ( invite_edit, 8 )
-        local invite_button = guiCreateButton( 0.76, 0.36, 0.2, 0.1, "Пригласить", true, members_tab )
-        local members_grid = guiCreateGridList( 0.01, 0.01, 0.5, 0.98, true, members_tab )
-        guiGridListSetSelectionMode( members_grid, 0 )
-        guiGridListAddColumn( members_grid, "ID", 0.22 )
-        guiGridListAddColumn( members_grid, "Имя", 0.7 )
+function createFactionWindow()
+    if isElement( FACTION_WINDOW ) then                -- UPD: (7) проверка на существование окна внутри функции
+        destroyElement( FACTION_WINDOW )
+        showCursor( false )
+    else
+        if faction then 
+            FACTION_WINDOW = guiCreateWindow( 0.25, 0.25, 0.4, 0.5, faction.name, true )  
+            local tab_panel = guiCreateTabPanel( 0, 0.05, 1, 1, true, FACTION_WINDOW )          
+            local members_tab = guiCreateTab( "Список участников", tab_panel )                
+            local city_tab = guiCreateTab( faction.name, tab_panel ) 
+            local delete_label = guiCreateLabel( 0.55, 0.05, 0.4, 0.1, "Выберите игрока из списка", true, members_tab )
+            local delete_button = guiCreateButton( 0.55, 0.11, 0.4, 0.1, "Уволить", true, members_tab )
+            local invite_label = guiCreateLabel( 0.55, 0.3, 0.4, 0.1, "Введите ID игрока", true, members_tab )
+            local invite_edit = guiCreateEdit( 0.54, 0.36, 0.2, 0.1, "", true, members_tab )
+            guiEditSetMaxLength ( invite_edit, 8 )
+            local invite_button = guiCreateButton( 0.76, 0.36, 0.2, 0.1, "Пригласить", true, members_tab )
+            local members_grid = guiCreateGridList( 0.01, 0.01, 0.5, 0.98, true, members_tab )
+            guiGridListSetSelectionMode( members_grid, 0 )
+            guiGridListAddColumn( members_grid, "ID", 0.15 )
+            guiGridListAddColumn( members_grid, "Имя", 0.5 )
+            guiGridListAddColumn( members_grid, "Должность", 0.28 )
         
-        local leader = getElementData( team, "leader" )
-        for _, player in pairs( getClientTeamMembers() ) do  -- заполняем список участников фракции
-            local id = getElementData( player, "player_id" )
-            local name = getPlayerName( player )
-            if player == leader then
-               name = name.." (Лидер)"
+            local leader = faction.leader
+            for member, rang in pairs( faction.members ) do  -- заполняем список участников фракции
+                local id = getElementData( member, "player_id" )
+                local name = getPlayerName( member )
+                guiGridListAddRow( members_grid, id, name, rang )
             end
-            guiGridListAddRow( members_grid, id, name )
-        end
         
-        if leader ~= getLocalPlayer() then  -- если клиент не лидер отключаем элементы
-            guiSetEnabled( city_tab, false )
-            guiSetEnabled( delete_button, false )
-            guiSetEnabled( invite_button, false )
-            guiSetEnabled( invite_edit, false )
-        end
+            if leader ~= getLocalPlayer() then  -- если клиент не лидер отключаем элементы
+                guiSetEnabled( city_tab, false )
+                guiSetEnabled( delete_button, false )
+                guiSetEnabled( invite_button, false )
+                guiSetEnabled( invite_edit, false )
+            end
 
-        showCursor( true )
+            showCursor( true )
 
-        addEventHandler( "onClientGUIClick", invite_button, function( button )
-            if button == "left" then 
-                local team_name = getClientTeamName()
-                local player_id = guiGetText( invite_edit )
-                local sender = getPlayerName( getLocalPlayer() ) 
-                local current_time = getTickCount()
-                if INVITE_SPAM[ player_id ] and current_time - INVITE_SPAM[ player_id ] < 60000 then    -- если инвайт был менее минуты назад
-                    local time_left = string.format( "%d", ( 60000 - ( current_time - INVITE_SPAM[ player_id ] ) ) / 1000 )
-                    outputChatBox("Приглашать можно раз в минуту. Ожидайте "..time_left.." сек.")
-                else
-                    INVITE_SPAM[player_id] = getTickCount() -- сохраняем время последнего инвайта для данного игрока
+            addEventHandler( "onClientGUIClick", invite_button, function( button )
+                if button == "left" then 
+                    local team_name = faction.name
+                    local player_id = guiGetText( invite_edit )
+                    local sender = getPlayerName( getLocalPlayer() ) 
+                    local current_time = getTickCount()
                     triggerServerEvent( "inviteToTeam", resourceRoot, player_id, team_name, sender )
                 end
-            end
-        end, false )
+            end, false )
 
-        addEventHandler( "onClientGUIClick", delete_button, function( button )
-            if button == "left" then 
-                local player_id = guiGridListGetItemText( members_grid, guiGridListGetSelectedItem( members_grid ) )
-                triggerServerEvent( "deletePlayerFromTeam", resourceRoot, player_id )
-            end
-        end, false)
+            addEventHandler( "onClientGUIClick", delete_button, function( button )
+                if button == "left" then 
+                    local player_id = guiGridListGetItemText( members_grid, guiGridListGetSelectedItem( members_grid ) )
+                    triggerServerEvent( "deletePlayerFromTeam", resourceRoot, player_id )
+                end
+            end, false )
+        end
     end   
 end
 
@@ -90,11 +84,11 @@ function createInviteWindow( player_id, team_name, sender )          -- окош
     showCursor( true )
 
     addEventHandler( "onClientRender", root, function()   
-        if isElement( invite_window ) then
+        if isElement( invite_window ) then        
             x = ( getTickCount() - start_tick ) / 150       -- исчезает с экрана через 15 сек
-            guiProgressBarSetProgress (progress, x ) 
+            guiProgressBarSetProgress ( progress, x ) 
             if x > 100 then
-                destroyWindow( invite_window )
+                destroyElement( invite_window )
                 start_tick = nil
                 showCursor( false )
             end
@@ -102,13 +96,13 @@ function createInviteWindow( player_id, team_name, sender )          -- окош
     end )
   
     function onGUIButtonClick( button )
-        if button == "left" then
+        if button == "left" and isElement( invite_window ) then
             if source == yes_button then
-                triggerServerEvent( "acceptInvite", resourceRoot, player_id, team_name )  -- принял приглашение
-                destroyWindow ( invite_window )
+                triggerServerEvent( "acceptInvite", resourceRoot )  -- принял приглашение
+                destroyElement( invite_window )
                 showCursor( false )
             elseif source == no_button then
-                destroyWindow( invite_window )
+                destroyElement( invite_window )
                 showCursor( false )
             end
         end
@@ -119,12 +113,9 @@ end
 addEvent( "invitePlayerToTeam", true )
 addEventHandler( "invitePlayerToTeam", resourceRoot, createInviteWindow )
 
-bindKey ("p", "down", function( button, press )   
-    if isElement( TEAM_WINDOW ) then 
-        destroyElement( TEAM_WINDOW )
-        showCursor( false )
-    else
-        createTeamWindow()
-    end        
-end )
+bindKey ( "p", "down", function()
+    refreshFactionData()
+    createFactionWindow()
+end)
 
+addEventHandler( "onClientResourceStart", resourceRoot, refreshFactionData)
