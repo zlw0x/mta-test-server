@@ -1,6 +1,7 @@
 loadstring( exports["interfacer"]:extend( "SDB" ) )()
-extend( "ShPlayer" )
-extend( "ShFaction" )
+loadstring( exports["interfacer"]:extend( "ShPlayer" ) )()
+loadstring( exports["interfacer"]:extend( "ShFaction" ) )()
+
 
 FACTION = {}
 
