@@ -1,0 +1,13 @@
+<meta>
+  <oop>true</oop>
+  <info author="Zolotov_A" version="1.0.0" name="interfacer"/>
+  <script src="Extend/ShPlayer.lua" type="shared"/>
+  <!-- <script src="Extend/SFactionClass.lua" type="server"/> -->
+  <script src="Extend/CElement.lua" type="client"/>
+  <script src="shared.lua" type="shared"/>
+  
+
+  <export function="extend" type="server" />
+  <export function="extend" type="client" />
+
+</meta>

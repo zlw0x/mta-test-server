@@ -1,0 +1,7 @@
+<meta>
+  <oop>true</oop>
+  <info author="Zolotov_A" version="1.0.0"/>
+  <script src="SFaction.lua" type="server"/>
+  <script src="CFactionGUI.lua" type="client"/>
+  <script src="SCity.lua" type="client"/>
+</meta>

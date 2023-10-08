@@ -1,0 +1,5 @@
+<meta>
+  <oop>true</oop>
+  <info author="Zolotov_A" version="1.0.0"/>
+  <script src="CDrawID.lua" type="client"/>
+</meta>

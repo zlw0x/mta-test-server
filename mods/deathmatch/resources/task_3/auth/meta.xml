@@ -1,0 +1,6 @@
+<meta>
+	<oop>true</oop>
+	<info author="Zolotov A." type="script" name="auth" />
+	<script src="Clogin.lua" type="client" />
+	<script src="Slogin.lua" type="server" />
+</meta>
