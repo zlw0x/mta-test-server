@@ -1,6 +1,6 @@
 loadstring( exports["interfacer"]:extend( "SDB" ) )()
-loadstring( exports["interfacer"]:extend( "ShPlayer" ) )()
-loadstring( exports["interfacer"]:extend( "ShFaction" ) )()
+extend( "ShPlayer" )
+extend( "ShFaction" )
 
 FACTION = {}
 
@@ -21,15 +21,7 @@ end
 createFaction("city_mayor", "Мэрия города")
 
 
-function getPlayerFactionID( player )
-	for faction_id, faction in pairs( FACTION ) do 
-		for member in pairs( faction.members ) do 
-			if member == player then 
-				return faction_id
-			end
-		end
-	end
-end
+
 
 function setFactionLeader( player_id, faction_id )
 	if player_id and faction_id then
@@ -39,7 +31,7 @@ function setFactionLeader( player_id, faction_id )
 			if member == player then
 				faction.members[ player ] = RANG[ 3 ]
 				faction.leader = player
-				outputChatBox( getPlayerName( member ).." назначен лидером фракции "..faction.name, source )
+				outputChatBox( member:getName().." назначен лидером фракции "..faction.name, source )
 				sendFactionDataToClient( player, faction )
 			end
 		end

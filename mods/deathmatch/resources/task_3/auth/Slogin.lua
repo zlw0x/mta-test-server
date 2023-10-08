@@ -1,5 +1,5 @@
 loadstring( exports["interfacer"]:extend( "SDB" ) )()
-loadstring( exports["interfacer"]:extend( "ShPlayer" ) )()
+Extend( "ShPlayer" )
 
 
 function loginPlayer( email, password )

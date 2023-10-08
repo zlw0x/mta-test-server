@@ -14,6 +14,26 @@ Player.SetID = function( self )
 end
 
 
+function getPlayerFactionID( player )
+	for faction_id, faction in pairs( FACTION ) do 
+		for member in pairs( faction.members ) do 
+			if member == player then 
+				return faction_id
+			end
+		end
+	end
+end
+
+function getPlayerByID( id ) 
+    for _, player in pairs( getElementsByType( "player" ) ) do
+        local player_id = player:getData( "player_id" )
+        if player_id == tonumber( id ) then
+            return player
+        end
+    end 
+end
+
+
 -- Player.getFaction = function( self, player )
 --     local email = getAccountName( getPlayerAccount( self ) )
 --     DB:query( function( qh ) 
@@ -39,11 +59,5 @@ end
 
 
 
-function getPlayerByID( id ) 
-    for _, player in pairs( getElementsByType( "player" ) ) do
-        local player_id = getElementData( player, "player_id" )
-        if player_id == tonumber( id ) then
-            return player
-        end
-    end 
-end
+
+
